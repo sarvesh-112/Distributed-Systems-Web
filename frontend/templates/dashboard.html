@@ -1,0 +1,727 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .dashboard-container {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+        margin-top: 20px;
+    }
+
+    /* Service Selector */
+    .service-selector {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+    }
+
+    .service-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 20px;
+        color: white;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        border: 3px solid transparent;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .service-card.active {
+        border-color: white;
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .service-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+
+    .service-name {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    /* Main Content Grid */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    @media (max-width: 992px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Workflow Visualization */
+    .workflow-card {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        color: white;
+        position: relative;
+        overflow: hidden;
+        min-height: 500px;
+    }
+
+    .workflow-card h3 {
+        font-weight: bold;
+        margin-bottom: 25px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .workflow-diagram {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .workflow-node {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        opacity: 0.6;
+        transform: scale(0.95);
+    }
+
+    .workflow-node.active {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: #2ecc71;
+        border-width: 3px;
+        opacity: 1;
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(46, 204, 113, 0.4);
+    }
+
+    .workflow-node.pulse {
+        animation: pulse-node 0.6s ease-in-out;
+    }
+
+    @keyframes pulse-node {
+        0%, 100% { transform: scale(1.05); }
+        50% { transform: scale(1.15); }
+    }
+
+    .node-icon {
+        font-size: 36px;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .workflow-node.active .node-icon {
+        background: #2ecc71;
+        animation: rotate-icon 1s ease-in-out infinite;
+    }
+
+    @keyframes rotate-icon {
+        0%, 100% { transform: rotate(0deg) scale(1); }
+        50% { transform: rotate(5deg) scale(1.1); }
+    }
+
+    .node-content {
+        flex: 1;
+    }
+
+    .node-title {
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .node-description {
+        font-size: 13px;
+        opacity: 0.9;
+        line-height: 1.4;
+    }
+
+    .workflow-arrow {
+        width: 3px;
+        height: 25px;
+        background: rgba(255, 255, 255, 0.3);
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .workflow-arrow::after {
+        content: '';
+        position: absolute;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #2ecc71;
+        animation: flow-down 1s ease-in-out infinite;
+    }
+
+    .workflow-arrow.active::after {
+        animation: flow-down 0.5s ease-in-out infinite;
+    }
+
+    @keyframes flow-down {
+        0% { top: -100%; }
+        100% { top: 100%; }
+    }
+
+    /* Logs Card */
+    .logs-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        min-height: 500px;
+    }
+
+    .logs-card h3 {
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .log-controls {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+
+    .log-controls button {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .log-controls button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    #logBox {
+        flex: 1;
+        overflow-y: auto;
+        background: rgba(0, 0, 0, 0.3);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 15px;
+        font-family: 'Courier New', monospace;
+        font-size: 13px;
+        line-height: 1.6;
+        backdrop-filter: blur(5px);
+    }
+
+    #logBox::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #logBox::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+    }
+
+    #logBox::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+
+    .log-entry {
+        padding: 8px 12px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-left: 3px solid #2ecc71;
+        animation: slideInLog 0.3s ease-out;
+    }
+
+    @keyframes slideInLog {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .log-time {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 11px;
+    }
+
+    .empty-logs {
+        text-align: center;
+        padding: 40px;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .empty-logs i {
+        font-size: 64px;
+        margin-bottom: 15px;
+        opacity: 0.3;
+    }
+
+    /* Service Info Panel */
+    .service-info {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .service-info h4 {
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .service-info p {
+        font-size: 14px;
+        opacity: 0.9;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    /* Stats badges */
+    .stats-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+
+    .stat-badge {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 15px 20px;
+        text-align: center;
+        flex: 1;
+        min-width: 150px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        opacity: 0.8;
+        text-transform: uppercase;
+    }
+
+    .play-button {
+        background: rgba(46, 204, 113, 0.3) !important;
+        border-color: #2ecc71 !important;
+        font-weight: bold;
+    }
+
+    .play-button:hover {
+        background: rgba(46, 204, 113, 0.5) !important;
+    }
+</style>
+
+<div class="content-section">
+    <h2 class="mb-4">
+        <i class="bi bi-diagram-3-fill"></i> Distributed Systems Workflow Dashboard
+    </h2>
+
+    <!-- Service Selector -->
+    <div class="service-selector">
+        <div class="service-card active" onclick="loadService('socket')" id="card-socket">
+            <div class="service-icon">🔌</div>
+            <div class="service-name">Socket Programming</div>
+        </div>
+        <div class="service-card" onclick="loadService('p2p')" id="card-p2p">
+            <div class="service-icon">🔄</div>
+            <div class="service-name">P2P File Transfer</div>
+        </div>
+        <div class="service-card" onclick="loadService('rpc')" id="card-rpc">
+            <div class="service-icon">⚙️</div>
+            <div class="service-name">RPC Services</div>
+        </div>
+        <div class="service-card" onclick="loadService('shared-memory')" id="card-shared-memory">
+            <div class="service-icon">💾</div>
+            <div class="service-name">Shared Memory</div>
+        </div>
+        <div class="service-card" onclick="loadService('websocket')" id="card-websocket">
+            <div class="service-icon">💬</div>
+            <div class="service-name">WebSocket Chat</div>
+        </div>
+        <div class="service-card" onclick="loadService('rmi')" id="card-rmi">
+            <div class="service-icon">☕</div>
+            <div class="service-name">Java RMI</div>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Main Grid -->
+    <div class="main-grid">
+        <!-- Workflow Visualization -->
+        <div class="workflow-card">
+            <h3>
+                <i class="bi bi-arrow-repeat"></i> <span id="workflow-title">Socket Programming Workflow</span>
+            </h3>
+
+            <!-- Service Info -->
+            <div class="service-info" id="service-info">
+                <h4>📡 About Socket Programming</h4>
+                <p>Socket programming enables network communication between client and server using TCP/IP or UDP protocols. Data flows through established connections.</p>
+            </div>
+
+            <!-- Workflow Diagram -->
+            <div class="workflow-diagram" id="workflow-diagram">
+                <!-- Dynamically loaded -->
+            </div>
+
+            <!-- Control Button -->
+            <button class="btn btn-custom play-button mt-3 w-100" onclick="playWorkflow()">
+                <i class="bi bi-play-circle"></i> Play Workflow Animation
+            </button>
+        </div>
+
+        <!-- Live Logs -->
+        <div class="logs-card">
+            <h3>
+                <span><i class="bi bi-terminal"></i> Service Logs</span>
+            </h3>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-badge">
+                    <div class="stat-value" id="workflowRuns">0</div>
+                    <div class="stat-label">Workflows Run</div>
+                </div>
+                <div class="stat-badge">
+                    <div class="stat-value" id="totalLogs">0</div>
+                    <div class="stat-label">Total Logs</div>
+                </div>
+            </div>
+
+            <div class="log-controls">
+                <button onclick="clearLogs()">
+                    <i class="bi bi-trash"></i> Clear
+                </button>
+                <button onclick="pauseLogs()" id="pauseBtn">
+                    <i class="bi bi-pause-circle"></i> Pause
+                </button>
+            </div>
+            <div id="logBox">
+                <div class="empty-logs">
+                    <i class="bi bi-hourglass-split"></i>
+                    <p>Select a service and play workflow...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+const logBox = document.getElementById("logBox");
+const socket = io();
+let workflowRuns = 0;
+let totalLogs = 0;
+let isPaused = false;
+let currentService = 'socket';
+let isAnimating = false;
+
+// Service Workflows Configuration
+const workflows = {
+    socket: {
+        title: "Socket Programming Workflow",
+        info: "Socket programming enables network communication between client and server using TCP/IP or UDP protocols. Data flows through established connections.",
+        steps: [
+            { icon: "🖥️", title: "Client Application", desc: "User initiates connection request from client application" },
+            { icon: "🔌", title: "Socket Creation", desc: "Client creates socket and connects to server IP:Port" },
+            { icon: "🌐", title: "Server Socket", desc: "Server socket listens for incoming connections on specific port" },
+            { icon: "🤝", title: "Connection Established", desc: "Three-way TCP handshake establishes connection" },
+            { icon: "📤", title: "Data Transfer", desc: "Client sends data packets through socket connection" },
+            { icon: "📥", title: "Server Receives", desc: "Server receives and processes the data" },
+            { icon: "⚙️", title: "Processing", desc: "Server processes request and prepares response" },
+            { icon: "📨", title: "Response Sent", desc: "Server sends response back through socket" },
+            { icon: "✅", title: "Client Receives", desc: "Client receives and displays response to user" }
+        ]
+    },
+    p2p: {
+        title: "P2P File Transfer Workflow",
+        info: "Peer-to-peer file sharing allows direct file transfer between nodes without central server. Each peer acts as both client and server.",
+        steps: [
+            { icon: "👤", title: "Peer A (Sender)", desc: "User selects file to share from their system" },
+            { icon: "🔍", title: "Peer Discovery", desc: "System discovers available peers on the network" },
+            { icon: "📋", title: "File Metadata", desc: "File info (name, size, hash) is shared with network" },
+            { icon: "👥", title: "Peer B (Receiver)", desc: "Receiver peer requests the file" },
+            { icon: "🔗", title: "Direct Connection", desc: "Direct socket connection established between peers" },
+            { icon: "📦", title: "File Chunking", desc: "File is divided into chunks for transfer" },
+            { icon: "🚀", title: "Data Streaming", desc: "Chunks are streamed directly peer-to-peer" },
+            { icon: "✔️", title: "Verification", desc: "Receiver verifies chunks using hash checksums" },
+            { icon: "💾", title: "File Reassembly", desc: "Complete file is reassembled and saved" }
+        ]
+    },
+    rpc: {
+        title: "RPC (Remote Procedure Call) Workflow",
+        info: "RPC allows a program to execute procedures on a remote server as if they were local function calls, abstracting network communication.",
+        steps: [
+            { icon: "💻", title: "Client Program", desc: "Application calls a remote procedure as local function" },
+            { icon: "📦", title: "Marshalling", desc: "Client stub marshals parameters into message format" },
+            { icon: "🌐", title: "Network Transport", desc: "Message sent over network to remote server" },
+            { icon: "🖥️", title: "Server Receives", desc: "Server stub receives the RPC request" },
+            { icon: "📂", title: "Unmarshalling", desc: "Server unmarshals parameters from message" },
+            { icon: "⚙️", title: "Procedure Execution", desc: "Actual procedure executes on server with parameters" },
+            { icon: "📊", title: "Result Preparation", desc: "Return values are marshalled for response" },
+            { icon: "📨", title: "Response Transport", desc: "Results sent back over network" },
+            { icon: "✅", title: "Client Returns", desc: "Client receives result as if local function returned" }
+        ]
+    },
+    "shared-memory": {
+        title: "Shared Memory IPC Workflow",
+        info: "Shared memory allows multiple processes to access the same memory region for fast inter-process communication without data copying.",
+        steps: [
+            { icon: "🔧", title: "Memory Creation", desc: "Process creates shared memory segment in RAM" },
+            { icon: "🔑", title: "Key Generation", desc: "Unique key generated to identify memory segment" },
+            { icon: "📍", title: "Process A Attach", desc: "First process attaches to shared memory region" },
+            { icon: "✍️", title: "Write Data", desc: "Process A writes data directly to shared memory" },
+            { icon: "🔔", title: "Synchronization", desc: "Semaphore signals data availability" },
+            { icon: "📌", title: "Process B Attach", desc: "Second process attaches to same memory region" },
+            { icon: "📖", title: "Read Data", desc: "Process B reads data directly from shared memory" },
+            { icon: "🔄", title: "Concurrent Access", desc: "Both processes can read/write concurrently" },
+            { icon: "🗑️", title: "Cleanup", desc: "Memory detached and destroyed when done" }
+        ]
+    },
+    websocket: {
+        title: "WebSocket Chat Workflow",
+        info: "WebSocket provides full-duplex, bidirectional communication between client and server over a single TCP connection for real-time messaging.",
+        steps: [
+            { icon: "🌐", title: "HTTP Handshake", desc: "Client initiates WebSocket upgrade via HTTP request" },
+            { icon: "🤝", title: "Protocol Upgrade", desc: "Server accepts upgrade to WebSocket protocol" },
+            { icon: "🔗", title: "Persistent Connection", desc: "Full-duplex connection established and maintained" },
+            { icon: "👤", title: "User Joins", desc: "User connects and joins chat room" },
+            { icon: "💬", title: "Message Sent", desc: "User types and sends chat message" },
+            { icon: "📡", title: "Server Broadcast", desc: "Server receives and broadcasts to all clients" },
+            { icon: "📥", title: "Real-time Receive", desc: "All connected clients receive instantly" },
+            { icon: "🔄", title: "Bidirectional Flow", desc: "Messages flow freely both directions" },
+            { icon: "✅", title: "Display Update", desc: "Chat interface updates in real-time" }
+        ]
+    },
+    rmi: {
+        title: "Java RMI (Remote Method Invocation) Workflow",
+        info: "Java RMI enables Java objects to invoke methods on remote objects running on different JVMs, providing distributed object-oriented programming.",
+        steps: [
+            { icon: "☕", title: "Remote Interface", desc: "Define remote interface extending java.rmi.Remote" },
+            { icon: "🏗️", title: "Server Implementation", desc: "Implement remote interface in server class" },
+            { icon: "📋", title: "RMI Registry", desc: "Server registers object with RMI registry" },
+            { icon: "🔍", title: "Client Lookup", desc: "Client looks up remote object in registry" },
+            { icon: "🎭", title: "Stub Creation", desc: "Client receives stub (proxy) for remote object" },
+            { icon: "📞", title: "Method Invocation", desc: "Client invokes method on stub as local call" },
+            { icon: "🌐", title: "Network Transmission", desc: "Stub sends request over network to skeleton" },
+            { icon: "⚙️", title: "Server Execution", desc: "Skeleton invokes actual method on server object" },
+            { icon: "📦", title: "Result Serialization", desc: "Return value serialized and sent back" },
+            { icon: "✅", title: "Client Receives", desc: "Stub deserializes and returns result to client" }
+        ]
+    }
+};
+
+function loadService(service) {
+    if (isAnimating) return;
+    
+    currentService = service;
+    
+    // Update active card
+    document.querySelectorAll('.service-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    document.getElementById(`card-${service}`).classList.add('active');
+    
+    // Load workflow
+    const workflow = workflows[service];
+    document.getElementById('workflow-title').textContent = workflow.title;
+    document.getElementById('service-info').innerHTML = `
+        <h4>📡 About ${workflow.title}</h4>
+        <p>${workflow.info}</p>
+    `;
+    
+    // Build diagram
+    const diagram = document.getElementById('workflow-diagram');
+    diagram.innerHTML = '';
+    
+    workflow.steps.forEach((step, index) => {
+        // Add node
+        const node = document.createElement('div');
+        node.className = 'workflow-node';
+        node.id = `node-${index}`;
+        node.innerHTML = `
+            <div class="node-icon">${step.icon}</div>
+            <div class="node-content">
+                <div class="node-title">${step.title}</div>
+                <div class="node-description">${step.desc}</div>
+            </div>
+        `;
+        diagram.appendChild(node);
+        
+        // Add arrow (except after last node)
+        if (index < workflow.steps.length - 1) {
+            const arrow = document.createElement('div');
+            arrow.className = 'workflow-arrow';
+            arrow.id = `arrow-${index}`;
+            diagram.appendChild(arrow);
+        }
+    });
+}
+
+function playWorkflow() {
+    if (isAnimating) return;
+    
+    isAnimating = true;
+    workflowRuns++;
+    document.getElementById('workflowRuns').textContent = workflowRuns;
+    
+    const workflow = workflows[currentService];
+    
+    // Clear previous active states
+    document.querySelectorAll('.workflow-node').forEach(node => {
+        node.classList.remove('active', 'pulse');
+    });
+    document.querySelectorAll('.workflow-arrow').forEach(arrow => {
+        arrow.classList.remove('active');
+    });
+    
+    addLog(`🚀 Starting ${workflow.title}...`);
+    
+    // Animate each step
+    workflow.steps.forEach((step, index) => {
+        setTimeout(() => {
+            // Activate current node
+            const node = document.getElementById(`node-${index}`);
+            node.classList.add('active', 'pulse');
+            
+            // Activate arrow
+            if (index > 0) {
+                document.getElementById(`arrow-${index-1}`).classList.add('active');
+            }
+            
+            // Log the step
+            addLog(`${step.icon} ${step.title}: ${step.desc}`);
+            
+            // Remove pulse after animation
+            setTimeout(() => {
+                node.classList.remove('pulse');
+            }, 600);
+            
+            // Reset at end
+            if (index === workflow.steps.length - 1) {
+                setTimeout(() => {
+                    document.querySelectorAll('.workflow-node').forEach(n => {
+                        n.classList.remove('active');
+                    });
+                    document.querySelectorAll('.workflow-arrow').forEach(a => {
+                        a.classList.remove('active');
+                    });
+                    isAnimating = false;
+                    addLog(`✅ ${workflow.title} completed successfully!`);
+                }, 1000);
+            }
+        }, index * 800);
+    });
+}
+
+function addLog(message) {
+    const emptyState = logBox.querySelector('.empty-logs');
+    if (emptyState) {
+        logBox.innerHTML = '';
+    }
+    
+    const logEntry = document.createElement("div");
+    logEntry.className = "log-entry";
+    const time = new Date().toLocaleTimeString();
+    logEntry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
+    
+    logBox.appendChild(logEntry);
+    logBox.scrollTop = logBox.scrollHeight;
+    
+    totalLogs++;
+    document.getElementById('totalLogs').textContent = totalLogs;
+}
+
+function clearLogs() {
+    logBox.innerHTML = `
+        <div class="empty-logs">
+            <i class="bi bi-hourglass-split"></i>
+            <p>Select a service and play workflow...</p>
+        </div>
+    `;
+    totalLogs = 0;
+    document.getElementById('totalLogs').textContent = totalLogs;
+}
+
+function pauseLogs() {
+    isPaused = !isPaused;
+    const btn = document.getElementById('pauseBtn');
+    if (isPaused) {
+        btn.innerHTML = '<i class="bi bi-play-circle"></i> Resume';
+    } else {
+        btn.innerHTML = '<i class="bi bi-pause-circle"></i> Pause';
+    }
+}
+
+// Initialize with socket workflow
+loadService('socket');
+
+// Listen for real socket events
+socket.on("log_event", function(log) {
+    if (!isPaused) {
+        addLog(`[${log.module}] ${log.message}`);
+    }
+});
+</script>
+{% endblock %}
