@@ -18,7 +18,12 @@ app = Flask(
 )
 
 app.config["SECRET_KEY"] = "secret!"
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(
+    app,
+    cors_allowed_origins="*",
+    async_mode="threading"
+)
+
 
 PYTHON_EXEC = sys.executable
 
@@ -280,4 +285,13 @@ def rmi_download(filename):
 # ======================================
 
 if __name__ == "__main__":
-    socketio.run(app, debug=True)
+    import os
+    socketio.run(
+        app,
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=False
+    )
+
+
+
