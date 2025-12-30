@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .service-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
+        border: 2px solid transparent;
+    }
+
+    .service-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-color: #667eea;
+    }
+
+    .service-card:nth-child(1) { animation-delay: 0.1s; }
+    .service-card:nth-child(2) { animation-delay: 0.2s; }
+    .service-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .service-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #667eea;
+    }
+
+    .service-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: white;
+        font-size: 24px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .service-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .input-group-custom {
+        margin-bottom: 15px;
+    }
+
+    .form-control-modern {
+        border: 2px solid #667eea;
+        border-radius: 12px;
+        padding: 12px 18px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .form-control-modern:focus {
+        border-color: #764ba2;
+        box-shadow: 0 0 15px rgba(118, 75, 162, 0.3);
+        transform: scale(1.02);
+        outline: none;
+        background: white;
+    }
+
+    .form-control-modern::placeholder {
+        color: #95a5a6;
+    }
+
+    .btn-calculate {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        font-weight: bold;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-calculate:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-calculate:active {
+        transform: translateY(-1px);
+    }
+
+    .result-box {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 20px;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .result-box.show {
+        animation: resultPop 0.5s ease-out;
+    }
+
+    @keyframes resultPop {
+        0% { transform: scale(0.8); opacity: 0; }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .result-box i {
+        margin-right: 10px;
+        font-size: 24px;
+    }
+
+    .marks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .shake {
+        animation: shake 0.5s;
+    }
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: slideDown 0.8s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .page-header h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .service-card {
+            padding: 20px;
+        }
+
+        .marks-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .page-header h2 {
+            font-size: 2rem;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h2><i class="bi bi-gear-fill"></i> RPC Services</h2>
+    <p>Remote Procedure Call demonstrations with real-time calculations</p>
+</div>
+
+<!-- Tax Calculation Service -->
+<div class="service-card">
+    <div class="service-header">
+        <div class="service-icon">
+            <i class="bi bi-calculator"></i>
+        </div>
+        <h3 class="service-title">Tax Calculation</h3>
+    </div>
+    
+    <div class="input-group-custom">
+        <input type="number" class="form-control-modern" id="income" 
+               placeholder="Enter your annual income (₹)">
+    </div>
+    
+    <button class="btn-calculate" onclick="calculateTax()">
+        <i class="bi bi-currency-rupee"></i>
+        Calculate Tax
+    </button>
+    
+    <div class="result-box" id="taxResult">
+        <i class="bi bi-info-circle"></i>
+        Enter income to calculate tax
+    </div>
+</div>
+
+<!-- CGPA Calculation Service -->
+<div class="service-card">
+    <div class="service-header">
+        <div class="service-icon">
+            <i class="bi bi-mortarboard"></i>
+        </div>
+        <h3 class="service-title">CGPA Calculation</h3>
+    </div>
+    
+    <div class="marks-grid">
+        <input type="number" class="form-control-modern mark" placeholder="Subject 1" min="0" max="100">
+        <input type="number" class="form-control-modern mark" placeholder="Subject 2" min="0" max="100">
+        <input type="number" class="form-control-modern mark" placeholder="Subject 3" min="0" max="100">
+        <input type="number" class="form-control-modern mark" placeholder="Subject 4" min="0" max="100">
+        <input type="number" class="form-control-modern mark" placeholder="Subject 5" min="0" max="100">
+    </div>
+    
+    <button class="btn-calculate" onclick="calculateCGPA()">
+        <i class="bi bi-graph-up"></i>
+        Calculate CGPA
+    </button>
+    
+    <div class="result-box" id="cgpaResult">
+        <i class="bi bi-info-circle"></i>
+        Enter all subject marks to calculate CGPA
+    </div>
+</div>
+
+<!-- Voting Eligibility Service -->
+<div class="service-card">
+    <div class="service-header">
+        <div class="service-icon">
+            <i class="bi bi-check2-circle"></i>
+        </div>
+        <h3 class="service-title">Voting Eligibility Check</h3>
+    </div>
+    
+    <div class="input-group-custom">
+        <input type="number" class="form-control-modern" id="age" 
+               placeholder="Enter your age" min="0" max="150">
+    </div>
+    
+    <button class="btn-calculate" onclick="checkVoting()">
+        <i class="bi bi-person-check"></i>
+        Check Eligibility
+    </button>
+    
+    <div class="result-box" id="votingResult">
+        <i class="bi bi-info-circle"></i>
+        Enter age to check voting eligibility
+    </div>
+</div>
+
+<script>
+function showResult(elementId, message, isSuccess = true) {
+    const resultBox = document.getElementById(elementId);
+    const icon = isSuccess ? '<i class="bi bi-check-circle-fill" style="color: #28a745;"></i>' : 
+                            '<i class="bi bi-x-circle-fill" style="color: #dc3545;"></i>';
+    resultBox.innerHTML = icon + ' ' + message;
+    resultBox.classList.add('show');
+    setTimeout(() => resultBox.classList.remove('show'), 500);
+}
+
+function shakeElement(element) {
+    element.classList.add('shake');
+    setTimeout(() => element.classList.remove('shake'), 500);
+}
+
+function calculateTax() {
+    const incomeInput = document.getElementById("income");
+    const income = incomeInput.value;
+    
+    if (!income || income <= 0) {
+        shakeElement(incomeInput);
+        showResult("taxResult", "Please enter a valid income amount", false);
+        return;
+    }
+    
+    fetch("/rpc/tax", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({income: income})
+    })
+    .then(res => res.json())
+    .then(data => {
+        showResult("taxResult", data.result);
+    })
+    .catch(error => {
+        showResult("taxResult", "Error calculating tax. Please try again.", false);
+    });
+}
+
+function calculateCGPA() {
+    const markInputs = document.getElementsByClassName("mark");
+    const marks = Array.from(markInputs).map(i => i.value);
+    
+    // Validate all marks are entered
+    if (marks.some(m => !m || m === '')) {
+        Array.from(markInputs).forEach(input => {
+            if (!input.value) shakeElement(input);
+        });
+        showResult("cgpaResult", "Please enter all subject marks", false);
+        return;
+    }
+    
+    // Validate marks are between 0-100
+    if (marks.some(m => m < 0 || m > 100)) {
+        showResult("cgpaResult", "Marks must be between 0 and 100", false);
+        return;
+    }
+    
+    fetch("/rpc/cgpa", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({marks: marks})
+    })
+    .then(res => res.json())
+    .then(data => {
+        showResult("cgpaResult", "CGPA: " + data.result);
+    })
+    .catch(error => {
+        showResult("cgpaResult", "Error calculating CGPA. Please try again.", false);
+    });
+}
+
+function checkVoting() {
+    const ageInput = document.getElementById("age");
+    const age = ageInput.value;
+    
+    if (!age || age <= 0) {
+        shakeElement(ageInput);
+        showResult("votingResult", "Please enter a valid age", false);
+        return;
+    }
+    
+    fetch("/rpc/voting", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({age: age})
+    })
+    .then(res => res.json())
+    .then(data => {
+        const isEligible = data.result.includes("eligible") || data.result.includes("Eligible");
+        showResult("votingResult", data.result, isEligible);
+    })
+    .catch(error => {
+        showResult("votingResult", "Error checking eligibility. Please try again.", false);
+    });
+}
+
+// Add enter key support
+document.getElementById("income").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") calculateTax();
+});
+
+document.getElementById("age").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") checkVoting();
+});
+
+// Add enter key support for marks (calculate on last input)
+const markInputs = document.getElementsByClassName("mark");
+Array.from(markInputs).forEach((input, index) => {
+    input.addEventListener("keypress", function(e) {
+        if (e.key === "Enter") {
+            if (index === markInputs.length - 1) {
+                calculateCGPA();
+            } else {
+                markInputs[index + 1].focus();
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

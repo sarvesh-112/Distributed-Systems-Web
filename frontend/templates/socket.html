@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: slideDown 0.8s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .page-header h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 10px;
+    }
+
+    .page-header p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+    }
+
+    .demo-card {
+        background: white;
+        border-radius: 20px;
+        padding: 35px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+        border: 2px solid transparent;
+    }
+
+    .demo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-color: #667eea;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .input-section {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+    }
+
+    .input-label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .message-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #667eea;
+        border-radius: 12px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .message-input:focus {
+        border-color: #764ba2;
+        box-shadow: 0 0 15px rgba(118, 75, 162, 0.3);
+        transform: scale(1.02);
+        outline: none;
+    }
+
+    .message-input::placeholder {
+        color: #95a5a6;
+    }
+
+    .send-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .send-button:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+    }
+
+    .send-button:active {
+        transform: translateY(-1px);
+    }
+
+    .send-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .output-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-top: 25px;
+    }
+
+    .output-card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .output-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .output-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .output-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .output-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+    }
+
+    .output-content {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 12px;
+        padding: 20px;
+        min-height: 150px;
+        max-height: 300px;
+        overflow-y: auto;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #2c3e50;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .output-content.empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #95a5a6;
+        font-style: italic;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .status-badge.ready {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-badge.processing {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .status-badge.success {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .info-card {
+        background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+        border-radius: 15px;
+        padding: 20px;
+        margin-top: 25px;
+        border-left: 5px solid #00acc1;
+    }
+
+    .info-card h4 {
+        color: #006064;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .info-card p {
+        color: #00838f;
+        margin: 5px 0;
+        line-height: 1.6;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+
+    .shake {
+        animation: shake 0.5s;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+
+    .pulse {
+        animation: pulse 0.5s;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .page-header h2 {
+            font-size: 2rem;
+        }
+
+        .output-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .demo-card {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h2><i class="bi bi-plug-fill"></i> Interactive Socket Client–Server Demo</h2>
+    <p>Experience real-time client-server communication using TCP sockets</p>
+</div>
+
+<div class="demo-card">
+    <div class="input-section">
+        <div class="input-label">
+            <i class="bi bi-envelope-fill"></i>
+            Client Message
+        </div>
+        <input 
+            type="text" 
+            id="message" 
+            class="message-input" 
+            placeholder="Enter your message to send to the server..."
+            onkeypress="if(event.key === 'Enter') runSocket()"
+        >
+        <button class="send-button" id="sendBtn" onclick="runSocket()">
+            <i class="bi bi-send-fill"></i>
+            Send Message
+        </button>
+    </div>
+
+    <div class="output-grid">
+        <!-- Server Output -->
+        <div class="output-card">
+            <div class="output-header">
+                <div class="output-title">
+                    <div class="output-icon">
+                        <i class="bi bi-server"></i>
+                    </div>
+                    Server Output
+                </div>
+                <span class="status-badge ready" id="serverStatus">
+                    <i class="bi bi-circle-fill"></i> Ready
+                </span>
+            </div>
+            <div class="output-content empty" id="serverOutput">
+                <i class="bi bi-inbox"></i> Waiting for message...
+            </div>
+        </div>
+
+        <!-- Client Output -->
+        <div class="output-card">
+            <div class="output-header">
+                <div class="output-title">
+                    <div class="output-icon">
+                        <i class="bi bi-pc-display"></i>
+                    </div>
+                    Client Output
+                </div>
+                <span class="status-badge ready" id="clientStatus">
+                    <i class="bi bi-circle-fill"></i> Ready
+                </span>
+            </div>
+            <div class="output-content empty" id="clientOutput">
+                <i class="bi bi-inbox"></i> Waiting for response...
+            </div>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <h4>
+            <i class="bi bi-info-circle-fill"></i>
+            How It Works
+        </h4>
+        <p><strong>1. Client sends:</strong> Your message is transmitted to the server via TCP socket connection</p>
+        <p><strong>2. Server processes:</strong> The server receives and processes your message</p>
+        <p><strong>3. Client receives:</strong> The server's response is displayed in the client output</p>
+    </div>
+</div>
+
+<script>
+function updateStatus(elementId, status, text) {
+    const badge = document.getElementById(elementId);
+    badge.className = `status-badge ${status}`;
+    badge.innerHTML = `<i class="bi bi-circle-fill"></i> ${text}`;
+}
+
+function runSocket() {
+    const messageInput = document.getElementById("message");
+    const msg = messageInput.value.trim();
+    const sendBtn = document.getElementById("sendBtn");
+    
+    // Validation
+    if (msg === "") {
+        messageInput.classList.add("shake");
+        setTimeout(() => messageInput.classList.remove("shake"), 500);
+        return;
+    }
+    
+    // Disable button and show loading
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<span class="spinner"></span> Sending...';
+    
+    // Update status badges
+    updateStatus("serverStatus", "processing", "Processing");
+    updateStatus("clientStatus", "processing", "Waiting");
+    
+    // Clear previous outputs
+    const serverOutput = document.getElementById("serverOutput");
+    const clientOutput = document.getElementById("clientOutput");
+    serverOutput.className = "output-content empty";
+    clientOutput.className = "output-content empty";
+    serverOutput.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+    clientOutput.innerHTML = '<i class="bi bi-hourglass-split"></i> Waiting...';
+    
+    fetch("/socket/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+    })
+    .then(res => res.json())
+    .then(data => {
+        // Update server output
+        serverOutput.className = "output-content";
+        serverOutput.textContent = data.server_output || "No server output";
+        serverOutput.classList.add("pulse");
+        
+        // Update client output
+        clientOutput.className = "output-content";
+        clientOutput.textContent = data.client_output || "No client output";
+        clientOutput.classList.add("pulse");
+        
+        // Update status badges
+        updateStatus("serverStatus", "success", "Success");
+        updateStatus("clientStatus", "success", "Success");
+        
+        // Remove pulse animation
+        setTimeout(() => {
+            serverOutput.classList.remove("pulse");
+            clientOutput.classList.remove("pulse");
+        }, 500);
+    })
+    .catch(error => {
+        serverOutput.className = "output-content";
+        serverOutput.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error: ' + error.message;
+        clientOutput.className = "output-content";
+        clientOutput.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error: ' + error.message;
+        
+        updateStatus("serverStatus", "ready", "Ready");
+        updateStatus("clientStatus", "ready", "Ready");
+    })
+    .finally(() => {
+        // Re-enable button
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="bi bi-send-fill"></i> Send Message';
+    });
+}
+
+// Add enter key support info
+document.getElementById("message").addEventListener("focus", function() {
+    this.setAttribute("title", "Press Enter to send");
+});
+</script>
+
+{% endblock %}

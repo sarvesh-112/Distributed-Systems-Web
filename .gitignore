@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node / frontend cache (if any)
+node_modules/
+
+# Java compiled files
+*.class
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary uploads (optional – keep if you want)
+# shared_data/

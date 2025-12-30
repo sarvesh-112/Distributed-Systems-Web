@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Shared Memory Live Dashboard</h2>
+
+<p><strong>Current Shared Value:</strong></p>
+<h1 id="sharedValue">Loading...</h1>
+
+<button onclick="incrementValue()">Increment (+5)</button>
+
+<script>
+function fetchValue() {
+    fetch("/shared-memory/value")
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("sharedValue").innerText = data.value;
+        });
+}
+
+// Manual increment
+function incrementValue() {
+    fetch("/shared-memory/increment", { method: "POST" })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("sharedValue").innerText = data.value;
+        });
+}
+
+// Auto-refresh every second
+setInterval(fetchValue, 1000);
+fetchValue();
+</script>
+{% endblock %}

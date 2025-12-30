@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distributed Systems Web</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .particle:nth-child(1) { width: 80px; height: 80px; left: 10%; animation-delay: 0s; }
+        .particle:nth-child(2) { width: 60px; height: 60px; left: 30%; animation-delay: 2s; }
+        .particle:nth-child(3) { width: 100px; height: 100px; left: 50%; animation-delay: 4s; }
+        .particle:nth-child(4) { width: 70px; height: 70px; left: 70%; animation-delay: 6s; }
+        .particle:nth-child(5) { width: 90px; height: 90px; left: 85%; animation-delay: 8s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-100vh) rotate(360deg); opacity: 0.8; }
+        }
+
+        /* Floating student info badge */
+        .student-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1050;
+            animation: slideInRight 1s ease-out, pulse 3s infinite ease-in-out;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .student-badge h5 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .student-badge p {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Header Styling */
+        .custom-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px 0;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 100;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .custom-header h1 {
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4);
+            animation: glow 2s ease-in-out infinite;
+            font-size: 2rem;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4), 0 0 10px rgba(255, 255, 255, 0.3); }
+            50% { text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 255, 255, 0.6); }
+        }
+
+        .nav-pills .nav-link {
+            color: #ecf0f1;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin: 5px;
+        }
+
+        .nav-pills .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 10;
+            animation: fadeInUp 1s ease-out;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Custom Button Styling */
+        .btn-custom {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-refresh:hover {
+            transform: rotate(360deg) scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 3px dashed #667eea;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #e0e7ff 0%, #d4d9f5 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-zone.dragover {
+            border-color: #38ef7d;
+            background: linear-gradient(135deg, #d4fce3 0%, #c3f5d8 100%);
+            transform: scale(1.05);
+        }
+
+        .upload-icon {
+            font-size: 64px;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        /* Result Box */
+        .result-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            min-height: 100px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-box.success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .result-box.error {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+
+        /* File List */
+        .file-list-container {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-height: 250px;
+        }
+
+        .file-item {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .file-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .file-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .file-link:hover {
+            color: #764ba2;
+        }
+
+        .file-icon {
+            font-size: 24px;
+            color: #667eea;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 80px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        /* Progress Bar */
+        .upload-progress {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress {
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            font-weight: bold;
+            animation: progressAnimation 2s ease-in-out;
+        }
+
+        @keyframes progressAnimation {
+            0% { width: 0%; }
+        }
+
+        /* Cards */
+        .info-card {
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .student-badge {
+                position: static;
+                margin: 20px;
+                text-align: center;
+            }
+
+            .custom-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .download-btn {
+                width: 100%;
+            }
+        }
+
+        /* Animation */
+        .content-section {
+            animation: fadeInUp 1s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .content-section:nth-child(2) { animation-delay: 0.2s; }
+        .content-section:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Loading Spinner */
+        .spinner-overlay {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .file-size-badge {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Floating student info badge -->
+    <div class="student-badge">
+        <h5><i class="bi bi-person-circle"></i> Sarvesh G</h5>
+        <p>CH.SC.U4CSE23055</p>
+    </div>
+
+    <!-- Header -->
+    <header class="custom-header">
+        <div class="container">
+            <h1 class="mb-3"><i class="bi bi-diagram-3"></i> Distributed Systems Web Interface</h1>
+            <ul class="nav nav-pills flex-wrap">
+                <li class="nav-item">
+                    <a class="nav-link" href="/"><i class="bi bi-house-door"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/socket"><i class="bi bi-plug"></i> Socket Demo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/p2p"><i class="bi bi-file-earmark-arrow-down"></i> P2P Files</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/rpc"><i class="bi bi-gear"></i> RPC Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/shared-memory"><i class="bi bi-memory"></i> Shared Memory</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/chat"><i class="bi bi-chat-dots"></i> WebSocket Chat</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/rmi"><i class="bi bi-cup-hot"></i> Java RMI</a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="main-content p-4 p-md-5">
+            <div class="content-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2><i class="bi bi-cloud-upload-fill text-primary"></i> Java RMI File Upload</h2>
+                    <span class="badge bg-success fs-6">
+                        <i class="bi bi-database-check"></i> RMI Active
+                    </span>
+                </div>
+
+                <!-- Info Card -->
+                <div class="info-card">
+                    <h5><i class="bi bi-info-circle-fill text-info"></i> About Java RMI</h5>
+                    <p class="mb-0">Java Remote Method Invocation allows you to invoke methods on objects running in different JVM processes. Upload files securely through RMI protocol.</p>
+                </div>
+
+                <!-- Upload Form -->
+                <form id="uploadForm">
+                    <div class="upload-zone" id="uploadZone">
+                        <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                        <h4>Drag & Drop File Here</h4>
+                        <p class="text-muted mb-3">or click to browse</p>
+                        <input type="file" name="file" id="fileInput" class="d-none" required>
+                        <button type="button" class="btn btn-custom btn-lg" onclick="document.getElementById('fileInput').click()">
+                            <i class="bi bi-folder2-open"></i> Choose File
+                        </button>
+                        <p class="text-muted mt-3 mb-0" id="fileName">No file selected</p>
+                    </div>
+                    
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" 
+                                 style="width: 100%" id="progressBar">Uploading...</div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-custom btn-lg">
+                            <i class="bi bi-upload"></i> Upload via RMI
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Upload Result -->
+                <div class="mt-4">
+                    <h4><i class="bi bi-terminal"></i> Upload Result</h4>
+                    <div class="result-box" id="result">
+                        <i class="bi bi-hourglass-split"></i> Waiting for file upload...
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-5">
+
+            <!-- Received Files Section -->
+            <div class="content-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3><i class="bi bi-file-earmark-check"></i> Received Files</h3>
+                    <button class="btn btn-refresh" onclick="loadFiles()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="file-list-container position-relative">
+                    <div class="spinner-overlay" id="loadingSpinner">
+                        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div id="fileList">
+                        <div class="empty-state">
+                            <i class="bi bi-inbox"></i>
+                            <h5>Loading files...</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // File input change handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+            document.getElementById('fileName').textContent = fileName;
+            if (e.target.files[0]) {
+                const fileSize = (e.target.files[0].size / 1024).toFixed(2);
+                document.getElementById('fileName').innerHTML = `
+                    <i class="bi bi-file-check text-success"></i> ${fileName} 
+                    <span class="file-size-badge">${fileSize} KB</span>
+                `;
+            }
+        });
+
+        // Drag and drop handlers
+        const uploadZone = document.getElementById('uploadZone');
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('fileInput').files = files;
+                const event = new Event('change');
+                document.getElementById('fileInput').dispatchEvent(event);
+            }
+        });
+
+        // Form submit handler
+        document.getElementById("uploadForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                alert('Please select a file first!');
+                return;
+            }
+            
+            // Show progress bar
+            document.getElementById('uploadProgress').style.display = 'block';
+            const resultBox = document.getElementById('result');
+            resultBox.className = 'result-box';
+            resultBox.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading file via RMI...';
+            
+            const formData = new FormData(this);
+            fetch("/rmi/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('uploadProgress').style.display = 'none';
+                resultBox.className = 'result-box success';
+                resultBox.innerHTML = `<i class="bi bi-check-circle"></i> ${data.output}`;
+                
+                // Reset form
+                document.getElementById('uploadForm').reset();
+                document.getElementById('fileName').textContent = 'No file selected';
+                
+                // Auto-refresh file list
+                setTimeout(() => loadFiles(), 500);
+            })
+            .catch(error => {
+                document.getElementById('uploadProgress').style.display = 'none';
+                resultBox.className = 'result-box error';
+                resultBox.innerHTML = `<i class="bi bi-x-circle"></i> Upload failed: ${error.message}`;
+            });
+        });
+
+        // Load files function
+        function loadFiles() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+            
+            fetch("/rmi/files")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    const fileListDiv = document.getElementById("fileList");
+                    fileListDiv.innerHTML = "";
+                    
+                    if (data.files.length === 0) {
+                        fileListDiv.innerHTML = `
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <h5>No files received yet</h5>
+                                <p>Upload a file using the form above</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    data.files.forEach((file, index) => {
+                        const fileItem = document.createElement("div");
+                        fileItem.className = "file-item";
+                        fileItem.style.animationDelay = `${index * 0.1}s`;
+                        
+                        // Determine file icon
+                        let fileIcon = "bi-file-earmark";
+                        const ext = file.split('.').pop().toLowerCase();
+                        if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                            fileIcon = "bi-file-earmark-image";
+                        } else if (['pdf'].includes(ext)) {
+                            fileIcon = "bi-file-earmark-pdf";
+                        } else if (['doc', 'docx'].includes(ext)) {
+                            fileIcon = "bi-file-earmark-word";
+                        } else if (['txt'].includes(ext)) {
+                            fileIcon = "bi-file-earmark-text";
+                        } else if (['java'].includes(ext)) {
+                            fileIcon = "bi-filetype-java";
+                        }
+                        
+                        fileItem.innerHTML = `
+                            <a href="/rmi/download/${encodeURIComponent(file)}" class="file-link">
+                                <i class="bi ${fileIcon} file-icon"></i>
+                                <span>${file}</span>
+                            </a>
+                            <button class="download-btn" onclick="downloadFile('${encodeURIComponent(file)}')">
+                                <i class="bi bi-download"></i> Download
+                            </button>
+                        `;
+                        
+                        fileListDiv.appendChild(fileItem);
+                    });
+                })
+                .catch(error => {
+                    document.getElementById('loadingSpinner').style.display = 'none';
+                    document.getElementById("fileList").innerHTML = `
+                        <div class="empty-state">
+                            <i class="bi bi-exclamation-triangle text-danger"></i>
+                            <h5>Error loading files</h5>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+        
+        function downloadFile(filename) {
+            window.location.href = '/rmi/download/' + filename;
+        }
+
+        // Load files on page load
+        loadFiles();
+    </script>
+</body>
+</html>

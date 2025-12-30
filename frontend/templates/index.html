@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .welcome-header {
+        text-align: center;
+        margin-bottom: 40px;
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .welcome-header h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 15px;
+    }
+
+    .welcome-header p {
+        font-size: 1.2rem;
+        color: #7f8c8d;
+    }
+
+    .quick-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .action-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px 35px;
+        border-radius: 30px;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+    }
+
+    .action-btn:active {
+        transform: translateY(-1px);
+    }
+
+    .status-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .status-card h3 {
+        color: #2c3e50;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .status-item {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .status-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .status-label {
+        font-size: 14px;
+        color: #7f8c8d;
+        margin-bottom: 5px;
+    }
+
+    .status-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .status-icon {
+        font-size: 28px;
+    }
+
+    .feature-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        animation: fadeInUp 1s ease-out;
+        animation-fill-mode: both;
+    }
+
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        border-color: #667eea;
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 30px;
+        margin-bottom: 20px;
+    }
+
+    .feature-card h4 {
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+
+    .feature-card p {
+        color: #7f8c8d;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .welcome-header h2 {
+            font-size: 2rem;
+        }
+
+        .quick-actions {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="content-section">
+    <div class="welcome-header">
+        <h2><i class="bi bi-house-heart"></i> Welcome to Distributed Systems</h2>
+        <p class="lead">Explore various distributed computing concepts and protocols through interactive demonstrations</p>
+    </div>
+</div>
+
+<hr>
+
+<div class="content-section">
+    <h3 style="text-align: center; color: #2c3e50; margin-bottom: 25px;">
+        <i class="bi bi-lightning-charge"></i> Quick Actions
+    </h3>
+    <div class="quick-actions">
+        <button class="action-btn" onclick="window.location.href='/socket'">
+            <i class="bi bi-plug"></i>
+            Connect Socket
+        </button>
+        <button class="action-btn" onclick="window.location.href='/p2p'">
+            <i class="bi bi-arrow-left-right"></i>
+            Start P2P
+        </button>
+        <button class="action-btn" onclick="window.location.href='/rpc'">
+            <i class="bi bi-gear"></i>
+            Call RPC
+        </button>
+        <button class="action-btn" onclick="window.location.href='/chat'">
+            <i class="bi bi-chat-dots"></i>
+            Join Chat
+        </button>
+    </div>
+</div>
+
+<hr>
+
+<div class="content-section">
+    <h3 style="color: #2c3e50; margin-bottom: 25px;">
+        <i class="bi bi-diagram-3"></i> Featured Concepts
+    </h3>
+    <div class="feature-cards">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-broadcast"></i>
+            </div>
+            <h4>Real-Time Communication</h4>
+            <p>Experience WebSocket-based chat and Socket.IO demonstrations for instant bidirectional communication.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-hdd-network"></i>
+            </div>
+            <h4>Remote Procedures</h4>
+            <p>Interact with RPC and Java RMI services to understand remote method invocation and distributed computing.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="bi bi-share"></i>
+            </div>
+            <h4>Peer-to-Peer</h4>
+            <p>Explore P2P file sharing and discover how distributed systems enable decentralized data exchange.</p>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="content-section">
+    <div class="status-card">
+        <h3>
+            <i class="bi bi-activity"></i>
+            System Status
+        </h3>
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="status-label">Status</div>
+                <div class="status-value">
+                    <span class="status-icon" style="color: #28a745;">✅</span>
+                    Operational
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Active Connections</div>
+                <div class="status-value">
+                    <i class="bi bi-people-fill" style="color: #667eea;"></i>
+                    42
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Uptime</div>
+                <div class="status-value">
+                    <i class="bi bi-clock-fill" style="color: #764ba2;"></i>
+                    99.9%
+                </div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Last Updated</div>
+                <div class="status-value">
+                    <i class="bi bi-arrow-clockwise" style="color: #f5576c;"></i>
+                    Just now
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
